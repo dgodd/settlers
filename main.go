@@ -58,17 +58,45 @@ func (g *Game) Update(screen *ebiten.Image) error {
 	return nil
 }
 
+func drawWood(screen *ebiten.Image, x, y float32) {
+	v, i := hexagon(x,y, color.RGBA{0x16, 0x97, 0x38, 0xff})
+	screen.DrawTriangles(v, i, emptyImage, nil)
+}
+
+func drawWheat(screen *ebiten.Image, x, y float32) {
+	v, i := hexagon(x,y, color.RGBA{0xF3, 0xBA, 0x21, 0xff})
+	screen.DrawTriangles(v, i, emptyImage, nil)
+}
+
+func drawBrick(screen *ebiten.Image, x, y float32) {
+	v, i := hexagon(x,y, color.RGBA{0xE2, 0x64, 0x29, 0xff})
+	screen.DrawTriangles(v, i, emptyImage, nil)
+}
+
+func drawSheep(screen *ebiten.Image, x, y float32) {
+	v, i := hexagon(x,y, color.RGBA{0x90, 0xB6, 0x0B, 0xff})
+	screen.DrawTriangles(v, i, emptyImage, nil)
+}
+
+func drawOre(screen *ebiten.Image, x, y float32) {
+	v, i := hexagon(x,y, color.RGBA{0xA2, 0xA8, 0xA4, 0xff})
+	screen.DrawTriangles(v, i, emptyImage, nil)
+}
+
+func drawWater(screen *ebiten.Image, x, y float32) {
+	v, i := hexagon(x,y, color.RGBA{0x08, 0x66, 0xA5, 0xff})
+	screen.DrawTriangles(v, i, emptyImage, nil)
+}
+
 func (g *Game) Draw(screen *ebiten.Image) {
 	// cf := float64(g.count)
 
-	v, i := hexagon(200, 200, color.RGBA{0x80, 0x0, 0x0, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
-
-	v, i = hexagon(400, 400, color.RGBA{0x0, 0x80, 0x0, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
-
-	v, i = hexagon(600, 600, color.RGBA{0x0, 0x0, 0x80, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
+	drawWood(screen, 200, 200)
+	drawWheat(screen, 300, 200)
+	drawBrick(screen, 400, 200)
+	drawSheep(screen, 250, 275)
+	drawOre(screen, 350, 275)
+	drawWater(screen, 450, 275)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.CurrentTPS()))
 }
