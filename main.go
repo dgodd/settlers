@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"log"
-	"math"
+	//"math"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
@@ -27,115 +27,29 @@ type Game struct {
 	count int
 }
 
-func line(x0, y0, x1, y1 float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
-	const width = 1
-
-	theta := math.Atan2(float64(y1-y0), float64(x1-x0))
-	theta += math.Pi / 2
-	dx := float32(math.Cos(theta))
-	dy := float32(math.Sin(theta))
-
+func hexagon(x, y float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
 	r := float32(clr.R) / 0xff
 	g := float32(clr.G) / 0xff
 	b := float32(clr.B) / 0xff
 	a := float32(clr.A) / 0xff
 
 	return []ebiten.Vertex{
-		{
-			DstX:   x0 - width*dx/2,
-			DstY:   y0 - width*dy/2,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-		{
-			DstX:   x0 + width*dx/2,
-			DstY:   y0 + width*dy/2,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-		{
-			DstX:   x1 - width*dx/2,
-			DstY:   y1 - width*dy/2,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-		{
-			DstX:   x1 + width*dx/2,
-			DstY:   y1 + width*dy/2,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-	}, []uint16{0, 1, 2, 1, 2, 3}
-}
-
-func rect(x, y, w, h float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
-	r := float32(clr.R) / 0xff
-	g := float32(clr.G) / 0xff
-	b := float32(clr.B) / 0xff
-	a := float32(clr.A) / 0xff
-	x0 := x
-	y0 := y
-	x1 := x + w
-	y1 := y + h
-
-	return []ebiten.Vertex{
-		{
-			DstX:   x0,
-			DstY:   y0,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-		{
-			DstX:   x1,
-			DstY:   y0,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-		{
-			DstX:   x0,
-			DstY:   y1,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-		{
-			DstX:   x1,
-			DstY:   y1,
-			SrcX:   1,
-			SrcY:   1,
-			ColorR: r,
-			ColorG: g,
-			ColorB: b,
-			ColorA: a,
-		},
-	}, []uint16{0, 1, 2, 1, 2, 3}
+		{ DstX:   x, DstY:   y-50, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+		{ DstX:   x+50, DstY:   y-25, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+		{ DstX:   x+50, DstY:   y+25, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+		{ DstX:   x, DstY:   y+50, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+		{ DstX:   x-50, DstY:   y+25, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+		{ DstX:   x-50, DstY:   y-25, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+	}, []uint16{
+		0, 1, 2,
+		1, 2, 3,
+		2, 3, 4,
+		3, 4, 5,
+		4, 5, 0,
+		5, 0, 1,
+		0, 2, 3,
+		3, 5, 0,
+	}
 }
 
 func (g *Game) Update(screen *ebiten.Image) error {
@@ -145,17 +59,15 @@ func (g *Game) Update(screen *ebiten.Image) error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	cf := float64(g.count)
-	v, i := line(100, 100, 300, 100, color.RGBA{0xff, 0xff, 0xff, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
-	v, i = line(50, 150, 50, 350, color.RGBA{0xff, 0xff, 0x00, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
-	v, i = line(50, 100+float32(cf), 200+float32(cf), 250, color.RGBA{0x00, 0xff, 0xff, 0xff})
+	// cf := float64(g.count)
+
+	v, i := hexagon(200, 200, color.RGBA{0x80, 0x0, 0x0, 0xff})
 	screen.DrawTriangles(v, i, emptyImage, nil)
 
-	v, i = rect(50+float32(cf), 50+float32(cf), 100+float32(cf), 100+float32(cf), color.RGBA{0x80, 0x80, 0x80, 0x80})
+	v, i = hexagon(400, 400, color.RGBA{0x0, 0x80, 0x0, 0xff})
 	screen.DrawTriangles(v, i, emptyImage, nil)
-	v, i = rect(300-float32(cf), 50, 120, 120, color.RGBA{0x00, 0x80, 0x00, 0x80})
+
+	v, i = hexagon(600, 600, color.RGBA{0x0, 0x0, 0x80, 0xff})
 	screen.DrawTriangles(v, i, emptyImage, nil)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.CurrentTPS()))
@@ -167,7 +79,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
-	ebiten.SetWindowTitle("Shapes (Ebiten Demo)")
+	ebiten.SetWindowTitle("Settlers of Catan")
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}
