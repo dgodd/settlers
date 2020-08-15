@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"image/color"
 	"log"
-	//"math"
-
+	"math/rand"
+	"time"
+	"github.com/dgodd/settlers/board"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
@@ -20,19 +21,9 @@ var (
 )
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
 	emptyImage.Fill(color.White)
 }
-
-const (
-	Nothing = iota
-	Water
-	Desert
-	Wood
-	Brick
-	Sheep
-	Wheat
-	Ore
-)
 
 var Colors = []color.RGBA{
 	color.RGBA{0x0, 0x0, 0x0, 0x00}, // Nothing
@@ -45,13 +36,8 @@ var Colors = []color.RGBA{
 	color.RGBA{0xA2, 0xA8, 0xA4, 0xff}, // Ore,
 }
 
-func drawOre(screen *ebiten.Image, x, y float32) {
-	v, i := hexagon(x,y, color.RGBA{0xA2, 0xA8, 0xA4, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
-}
-
 type Game struct {
-	Board [][]int
+	Board board.Board
 }
 
 func hexagon(x, y float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
@@ -87,14 +73,14 @@ func (g *Game) Update(screen *ebiten.Image) error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	// cf := float64(g.count)
 
-	for idxY, row := range g.Board {
-		for idxX, klass := range row {
+	for idxY, row := range g.Board.Tiles {
+		for idxX, tile := range row {
 			x := float32(idxX) * 100.0 + 50.0
 			y := float32(idxY) * 75.0 + 50.0
 			if (idxY % 2 == 1) {
 				x += 50
 			}
-			v, i := hexagon(x, y, Colors[klass])
+			v, i := hexagon(x, y, Colors[tile.Klass])
 			screen.DrawTriangles(v, i, emptyImage, nil)
 		} 
 	}
@@ -111,15 +97,7 @@ func main() {
 	ebiten.SetWindowTitle("Settlers of Catan")
 
 	game := &Game{
-		Board: [][]int{
-		  []int{Nothing, Nothing, Water, Water, Water, Water, Nothing},
-		  []int{Nothing, Water, Ore, Ore, Wood, Water},
-		  []int{Nothing, Water, Brick, Wheat, Wood, Wheat, Water},
-		  []int{Water, Brick, Wood, Wood, Sheep, Sheep, Water},
-		  []int{Nothing, Water, Wheat, Sheep, Sheep, Brick, Water},
-		  []int{Nothing, Water, Ore, Wheat, Desert, Water},
-		  []int{Nothing, Nothing, Water, Water, Water, Water, Nothing},
-		},
+		Board: board.NewSimple(),
 	}
 
 	if err := ebiten.RunGame(game); err != nil {
