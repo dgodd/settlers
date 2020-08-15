@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	screenWidth  = 640
-	screenHeight = 480
+	screenWidth  = 800
+	screenHeight = 600
 )
 
 var (
@@ -61,12 +61,12 @@ func hexagon(x, y float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
 	a := float32(clr.A) / 0xff
 
 	return []ebiten.Vertex{
-		{ DstX:   x, DstY:   y-50, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
-		{ DstX:   x+50, DstY:   y-25, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
-		{ DstX:   x+50, DstY:   y+25, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
-		{ DstX:   x, DstY:   y+50, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
-		{ DstX:   x-50, DstY:   y+25, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
-		{ DstX:   x-50, DstY:   y-25, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+		{ DstX:   x, DstY:   y-48, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+		{ DstX:   x+48, DstY:   y-24, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+		{ DstX:   x+48, DstY:   y+24, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+		{ DstX:   x, DstY:   y+48, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+		{ DstX:   x-48, DstY:   y+24, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
+		{ DstX:   x-48, DstY:   y-24, SrcX:   1, SrcY:   1, ColorR: r, ColorG: g, ColorB: b, ColorA: a },
 	}, []uint16{
 		0, 1, 2,
 		1, 2, 3,
@@ -89,8 +89,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	for idxY, row := range g.Board {
 		for idxX, klass := range row {
-			x := float32(idxX) * 100.0
-			y := float32(idxY) * 50.0
+			x := float32(idxX) * 100.0 + 50.0
+			y := float32(idxY) * 75.0 + 50.0
 			if (idxY % 2 == 1) {
 				x += 50
 			}
@@ -112,13 +112,13 @@ func main() {
 
 	game := &Game{
 		Board: [][]int{
-		  []int{Nothing, Water, Water, Water, Water, Nothing},
-		  []int{Water, Ore, Ore, Wood, Water},
-		  []int{Water, Brick, Wheat, Wood, Wheat, Water},
-		  []int{Water, Wood, Wood, Sheep, Sheep, Water},
-		  []int{Water, Wheat, Sheep, Sheep, Brick, Water},
-		  []int{Water, Ore, Wheat, Desert, Water},
-		  []int{Nothing, Water, Water, Water, Water, Nothing},
+		  []int{Nothing, Nothing, Water, Water, Water, Water, Nothing},
+		  []int{Nothing, Water, Ore, Ore, Wood, Water},
+		  []int{Nothing, Water, Brick, Wheat, Wood, Wheat, Water},
+		  []int{Water, Brick, Wood, Wood, Sheep, Sheep, Water},
+		  []int{Nothing, Water, Wheat, Sheep, Sheep, Brick, Water},
+		  []int{Nothing, Water, Ore, Wheat, Desert, Water},
+		  []int{Nothing, Nothing, Water, Water, Water, Water, Nothing},
 		},
 	}
 
