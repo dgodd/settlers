@@ -23,8 +23,35 @@ func init() {
 	emptyImage.Fill(color.White)
 }
 
+const (
+	Nothing = iota
+	Water
+	Desert
+	Wood
+	Brick
+	Sheep
+	Wheat
+	Ore
+)
+
+var Colors = []color.RGBA{
+	color.RGBA{0x0, 0x0, 0x0, 0x00}, // Nothing
+	color.RGBA{0x08, 0x66, 0xA5, 0xFF}, // Water
+	color.RGBA{0xD6, 0xCE, 0x90, 0xFF}, // Desert
+	color.RGBA{0x14, 0x95, 0x3A, 0xFF}, // Wood
+	color.RGBA{0xE2, 0x64, 0x29, 0xFF}, // Brick
+	color.RGBA{0x90, 0xB6, 0x0B, 0xff}, // Sheep,
+	color.RGBA{0xF3, 0xBA, 0x21, 0xff}, // Wheat,
+	color.RGBA{0xA2, 0xA8, 0xA4, 0xff}, // Ore,
+}
+
+func drawOre(screen *ebiten.Image, x, y float32) {
+	v, i := hexagon(x,y, color.RGBA{0xA2, 0xA8, 0xA4, 0xff})
+	screen.DrawTriangles(v, i, emptyImage, nil)
+}
+
 type Game struct {
-	count int
+	Board [][]int
 }
 
 func hexagon(x, y float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
@@ -53,50 +80,24 @@ func hexagon(x, y float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
 }
 
 func (g *Game) Update(screen *ebiten.Image) error {
-	g.count++
-	g.count %= 240
+	// TODO: DO STUFF
 	return nil
-}
-
-func drawWood(screen *ebiten.Image, x, y float32) {
-	v, i := hexagon(x,y, color.RGBA{0x16, 0x97, 0x38, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
-}
-
-func drawWheat(screen *ebiten.Image, x, y float32) {
-	v, i := hexagon(x,y, color.RGBA{0xF3, 0xBA, 0x21, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
-}
-
-func drawBrick(screen *ebiten.Image, x, y float32) {
-	v, i := hexagon(x,y, color.RGBA{0xE2, 0x64, 0x29, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
-}
-
-func drawSheep(screen *ebiten.Image, x, y float32) {
-	v, i := hexagon(x,y, color.RGBA{0x90, 0xB6, 0x0B, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
-}
-
-func drawOre(screen *ebiten.Image, x, y float32) {
-	v, i := hexagon(x,y, color.RGBA{0xA2, 0xA8, 0xA4, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
-}
-
-func drawWater(screen *ebiten.Image, x, y float32) {
-	v, i := hexagon(x,y, color.RGBA{0x08, 0x66, 0xA5, 0xff})
-	screen.DrawTriangles(v, i, emptyImage, nil)
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	// cf := float64(g.count)
 
-	drawWood(screen, 200, 200)
-	drawWheat(screen, 300, 200)
-	drawBrick(screen, 400, 200)
-	drawSheep(screen, 250, 275)
-	drawOre(screen, 350, 275)
-	drawWater(screen, 450, 275)
+	for idxY, row := range g.Board {
+		for idxX, klass := range row {
+			x := float32(idxX) * 100.0
+			y := float32(idxY) * 50.0
+			if (idxY % 2 == 1) {
+				x += 50
+			}
+			v, i := hexagon(x, y, Colors[klass])
+			screen.DrawTriangles(v, i, emptyImage, nil)
+		} 
+	}
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.CurrentTPS()))
 }
@@ -108,7 +109,20 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Settlers of Catan")
-	if err := ebiten.RunGame(&Game{}); err != nil {
+
+	game := &Game{
+		Board: [][]int{
+		  []int{Nothing, Water, Water, Water, Water, Nothing},
+		  []int{Water, Ore, Ore, Wood, Water},
+		  []int{Water, Brick, Wheat, Wood, Wheat, Water},
+		  []int{Water, Wood, Wood, Sheep, Sheep, Water},
+		  []int{Water, Wheat, Sheep, Sheep, Brick, Water},
+		  []int{Water, Ore, Wheat, Desert, Water},
+		  []int{Nothing, Water, Water, Water, Water, Nothing},
+		},
+	}
+
+	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
 }
