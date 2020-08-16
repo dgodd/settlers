@@ -26,7 +26,7 @@ const (
 
 var (
 	emptyImage, _ = ebiten.NewImage(16, 16, ebiten.FilterDefault)
-	woodImage *ebiten.Image
+	woodImage, brickImage *ebiten.Image
 	mplusFont     font.Face
 )
 
@@ -34,17 +34,30 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 
 	emptyImage.Fill(color.White)
-
-	f, err := os.Open("images/wood.png")
-	if err != nil {
-		log.Fatal(err)
+	{
+		f, err := os.Open("images/wood.png")
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, _, err := image.Decode(f)
+		if err != nil {
+			log.Fatal(err)
+		}
+		woodImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+		f.Close()
 	}
-	img, _, err := image.Decode(f)
-	if err != nil {
-		log.Fatal(err)
+	{
+		f, err := os.Open("images/brick.png")
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, _, err := image.Decode(f)
+		if err != nil {
+			log.Fatal(err)
+		}
+		brickImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+		f.Close()
 	}
-	woodImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
-	f.Close()
 
 	tt, err := truetype.Parse(fonts.MPlus1pRegular_ttf)
 	if err != nil {
@@ -120,6 +133,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				op.GeoM.Scale(0.3, 0.3)
 				op.GeoM.Translate(float64(x) - 30.0, float64(y) - 50.0)
 				screen.DrawImage(woodImage, op)
+			} else if tile.Klass == board.Brick {
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Scale(0.22, 0.22)
+				op.GeoM.Translate(float64(x) - 20.0, float64(y) - 46.0)
+				screen.DrawImage(brickImage, op)
 			}
 
 			if tile.Number > 0 {
