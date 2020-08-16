@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"image"
 	"github.com/dgodd/settlers/board"
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
@@ -9,6 +11,7 @@ import (
 	"github.com/hajimehoshi/ebiten/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/text"
 	"golang.org/x/image/font"
+	_ "image/png"
 	"image/color"
 	"log"
 	"math/rand"
@@ -23,6 +26,7 @@ const (
 
 var (
 	emptyImage, _ = ebiten.NewImage(16, 16, ebiten.FilterDefault)
+	woodImage *ebiten.Image
 	mplusFont     font.Face
 )
 
@@ -30,6 +34,17 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 
 	emptyImage.Fill(color.White)
+
+	f, err := os.Open("images/wood.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _, err := image.Decode(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+	woodImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	f.Close()
 
 	tt, err := truetype.Parse(fonts.MPlus1pRegular_ttf)
 	if err != nil {
@@ -99,6 +114,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			}
 			v, i := hexagon(x, y, Colors[tile.Klass])
 			screen.DrawTriangles(v, i, emptyImage, nil)
+
+			if tile.Klass == board.Wood {
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Scale(0.3, 0.3)
+				op.GeoM.Translate(float64(x) - 30.0, float64(y) - 50.0)
+				screen.DrawImage(woodImage, op)
+			}
 
 			if tile.Number > 0 {
 				drawNumber(screen, float64(x-15), float64(y), tile.Number)
