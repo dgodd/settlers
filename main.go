@@ -121,6 +121,14 @@ func drawNumber(screen *ebiten.Image, x,y float64, number int) {
 		textColor = color.RGBA{0xFF, 0x0, 0x0, 0xFF}
 	}
 	text.Draw(screen, strconv.Itoa(number), mplusFont, int(x + 14.0 - (float64(w) / 2.0)), int(y) + h + 4, textColor)
+
+	dots := ""
+	for i:=0;i<common[number];i++ {
+		dots += "."
+	}
+	b, _ = font.BoundString(mplusFont, dots)
+	w = (b.Max.X - b.Min.X).Ceil()
+	text.Draw(screen, dots, mplusFont, int(x + 14.0 - (float64(w) / 2.0)), int(y) + h + 10, textColor)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
