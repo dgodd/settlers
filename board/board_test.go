@@ -1,9 +1,9 @@
 package board_test
 
 import (
-	"testing"
-	"github.com/dgodd/settlers/board"
 	"fmt"
+	"github.com/dgodd/settlers/board"
+	"testing"
 )
 
 func TestNewSimple(t *testing.T) {

@@ -16,8 +16,8 @@ const (
 )
 
 type Tile struct {
-	Klass int
-	Number int
+	Klass     int
+	Number    int
 	HasRobber bool
 }
 
@@ -55,13 +55,13 @@ func New(tilePlaces [][]byte, numKlass []int, numbers []int) Board {
 
 func NewSimple() Board {
 	tilePlaces := [][]byte{
-		[]byte{'n', 'n', 'w', 'w', 'w', 'w', 'n'},
-		[]byte{'n', 'w', 'l', 'l', 'l', 'w', 'n'},
-		[]byte{'n', 'w', 'l', 'l', 'l', 'l', 'w'},
-		[]byte{'w', 'l', 'l', 'l', 'l', 'l', 'w'},
-		[]byte{'n', 'w', 'l', 'l', 'l', 'l', 'w'},
-		[]byte{'n', 'w', 'l', 'l', 'l', 'w', 'n'},
-		[]byte{'n', 'n', 'w', 'w', 'w', 'w', 'n'},
+		{'n', 'n', 'w', 'w', 'w', 'w', 'n'},
+		{'n', 'w', 'l', 'l', 'l', 'w', 'n'},
+		{'n', 'w', 'l', 'l', 'l', 'l', 'w'},
+		{'w', 'l', 'l', 'l', 'l', 'l', 'w'},
+		{'n', 'w', 'l', 'l', 'l', 'l', 'w'},
+		{'n', 'w', 'l', 'l', 'l', 'w', 'n'},
+		{'n', 'n', 'w', 'w', 'w', 'w', 'n'},
 	}
 	numKlass := []int{
 		Desert,
