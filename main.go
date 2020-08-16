@@ -26,7 +26,7 @@ const (
 
 var (
 	emptyImage, _ = ebiten.NewImage(16, 16, ebiten.FilterDefault)
-	woodImage, brickImage, sheepImage, wheatImage, oreImage *ebiten.Image
+	woodImage, brickImage, sheepImage, wheatImage, oreImage, houseImage *ebiten.Image
 	mplusFont     font.Face
 )
 
@@ -92,6 +92,18 @@ func init() {
 			log.Fatal(err)
 		}
 		oreImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+		f.Close()
+	}
+	{
+		f, err := os.Open("images/house.png")
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, _, err := image.Decode(f)
+		if err != nil {
+			log.Fatal(err)
+		}
+		houseImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
 		f.Close()
 	}
 
@@ -197,6 +209,27 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			}
 		}
 	}
+
+	{
+		x := 200.0
+		y := 200.0
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Scale(0.34, 0.34)
+		op.GeoM.Translate(float64(x) - 18.0, float64(y) - 48.0)
+		op.ColorM = ebiten.ScaleColor(1, 0, 0, 1)
+		screen.DrawImage(houseImage, op)
+	}
+	// for idxY, row := range g.Board.Tiles {
+	// 	for idxX, _ := range row {
+	// 		x := float32(idxX)*100.0 + 50.0
+	// 		y := float32(idxY)*75.0 + 50.0
+	// 		op := &ebiten.DrawImageOptions{}
+	// 		op.GeoM.Scale(0.4, 0.4)
+	// 		op.GeoM.Translate(float64(x) - 10.0, float64(y) - 40.0)
+	// 		op.ColorM = ebiten.ScaleColor(0, 1, 0, 1)
+	// 		screen.DrawImage(houseImage, op)
+	// 	}
+	// }
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.CurrentTPS()))
 }
