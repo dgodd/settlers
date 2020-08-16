@@ -26,7 +26,7 @@ const (
 
 var (
 	emptyImage, _ = ebiten.NewImage(16, 16, ebiten.FilterDefault)
-	woodImage, brickImage, sheepImage, wheatImage *ebiten.Image
+	woodImage, brickImage, sheepImage, wheatImage, oreImage *ebiten.Image
 	mplusFont     font.Face
 )
 
@@ -80,6 +80,18 @@ func init() {
 			log.Fatal(err)
 		}
 		wheatImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+		f.Close()
+	}
+	{
+		f, err := os.Open("images/ore.png")
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, _, err := image.Decode(f)
+		if err != nil {
+			log.Fatal(err)
+		}
+		oreImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
 		f.Close()
 	}
 
@@ -173,6 +185,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				op.GeoM.Rotate(0.9)
 				op.GeoM.Translate(float64(x) + 4.0, float64(y) - 50.0)
 				screen.DrawImage(wheatImage, op)
+			} else if tile.Klass == board.Ore {
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Scale(0.016, 0.016)
+				op.GeoM.Translate(float64(x) - 10.0, float64(y) - 40.0)
+				screen.DrawImage(oreImage, op)
 			}
 
 			if tile.Number > 0 {
