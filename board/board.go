@@ -1,6 +1,7 @@
 package board
 
 import (
+	"math"
 	"math/rand"
 )
 
@@ -22,7 +23,8 @@ type Tile struct {
 }
 
 type Board struct {
-	Tiles [][]Tile
+	Tiles   [][]Tile
+	Corners []XY
 }
 
 func New(tilePlaces [][]byte, numKlass []int, numbers []int) Board {
@@ -49,7 +51,8 @@ func New(tilePlaces [][]byte, numKlass []int, numbers []int) Board {
 		tiles = append(tiles, row)
 	}
 	return Board{
-		Tiles: tiles,
+		Tiles:   tiles,
+		Corners: corners(tiles),
 	}
 }
 
@@ -89,13 +92,19 @@ type XY struct {
 	Y float64
 }
 
-func (b *Board) Corners() []XY {
+func (xy *XY) Distance(other *XY) float64 {
+	x := xy.X - other.X
+	y := xy.Y - other.Y
+	return math.Sqrt(x*x + y*y)
+}
+
+func corners(tiles [][]Tile) []XY {
 	set := make(map[XY]bool, 0)
-	for idxY, row := range b.Tiles {
+	for idxY, row := range tiles {
 		for idxX, tile := range row {
 			if tile.Number > 0 {
-				x := float32(idxX)*100.0 + 50.0 - 11.0
-				y := float32(idxY)*75.0 + 50.0 - 11.0
+				x := float32(idxX)*100.0 + 50.0
+				y := float32(idxY)*75.0 + 50.0
 				if idxY%2 == 1 {
 					x += 50
 				}

@@ -142,7 +142,9 @@ var Colors = []color.RGBA{
 }
 
 type Game struct {
-	Board board.Board
+	Board            board.Board
+	LeftMouseClicked bool
+	MouseXY          board.XY
 }
 
 func hexagon(x, y float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
@@ -171,6 +173,14 @@ func hexagon(x, y float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
 }
 
 func (g *Game) Update(screen *ebiten.Image) error {
+	x, y := ebiten.CursorPosition()
+	g.MouseXY.X, g.MouseXY.Y = float64(x), float64(y)
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		g.LeftMouseClicked = true
+	} else if g.LeftMouseClicked {
+		g.LeftMouseClicked = false
+		fmt.Println("You pressed the 'LEFT' mouse button.", g.MouseXY)
+	}
 	// TODO: DO STUFF
 	return nil
 }
@@ -232,11 +242,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		screen.DrawImage(houseImage, op)
 	}
 
-	for _, xy := range g.Board.Corners() {
+	for _, xy := range g.Board.Corners {
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Scale(0.2, 0.2)
 		op.ColorM = ebiten.ScaleColor(1, 1, 0, 1)
-		op.GeoM.Translate(xy.X, xy.Y)
+		if g.MouseXY.Distance(&xy) <= 11.0 {
+			op.ColorM = ebiten.ScaleColor(0, 0, 1, 1)
+		}
+		op.GeoM.Translate(xy.X-11.0, xy.Y-11.0)
 		screen.DrawImage(circleImage, op)
 	}
 
