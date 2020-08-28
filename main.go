@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"image"
 	"github.com/dgodd/settlers/board"
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
@@ -11,10 +9,12 @@ import (
 	"github.com/hajimehoshi/ebiten/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/text"
 	"golang.org/x/image/font"
-	_ "image/png"
+	"image"
 	"image/color"
+	_ "image/png"
 	"log"
 	"math/rand"
+	"os"
 	"strconv"
 	"time"
 )
@@ -25,9 +25,9 @@ const (
 )
 
 var (
-	emptyImage, _ = ebiten.NewImage(16, 16, ebiten.FilterDefault)
-	woodImage, brickImage, sheepImage, wheatImage, oreImage, houseImage *ebiten.Image
-	mplusFont     font.Face
+	emptyImage, _                                                                    = ebiten.NewImage(16, 16, ebiten.FilterDefault)
+	woodImage, brickImage, sheepImage, wheatImage, oreImage, houseImage, circleImage *ebiten.Image
+	mplusFont                                                                        font.Face
 )
 
 func init() {
@@ -106,6 +106,18 @@ func init() {
 		houseImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
 		f.Close()
 	}
+	{
+		f, err := os.Open("images/circle.png")
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, _, err := image.Decode(f)
+		if err != nil {
+			log.Fatal(err)
+		}
+		circleImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+		f.Close()
+	}
 
 	tt, err := truetype.Parse(fonts.MPlus1pRegular_ttf)
 	if err != nil {
@@ -179,28 +191,28 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			if tile.Klass == board.Wood {
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Scale(0.3, 0.3)
-				op.GeoM.Translate(float64(x) - 30.0, float64(y) - 50.0)
+				op.GeoM.Translate(float64(x)-30.0, float64(y)-50.0)
 				screen.DrawImage(woodImage, op)
 			} else if tile.Klass == board.Brick {
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Scale(0.22, 0.22)
-				op.GeoM.Translate(float64(x) - 20.0, float64(y) - 46.0)
+				op.GeoM.Translate(float64(x)-20.0, float64(y)-46.0)
 				screen.DrawImage(brickImage, op)
 			} else if tile.Klass == board.Sheep {
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Scale(0.2, 0.2)
-				op.GeoM.Translate(float64(x) - 20.0, float64(y) - 44.0)
+				op.GeoM.Translate(float64(x)-20.0, float64(y)-44.0)
 				screen.DrawImage(sheepImage, op)
 			} else if tile.Klass == board.Wheat {
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Scale(0.3, 0.3)
 				op.GeoM.Rotate(0.9)
-				op.GeoM.Translate(float64(x) + 4.0, float64(y) - 50.0)
+				op.GeoM.Translate(float64(x)+4.0, float64(y)-50.0)
 				screen.DrawImage(wheatImage, op)
 			} else if tile.Klass == board.Ore {
 				op := &ebiten.DrawImageOptions{}
 				op.GeoM.Scale(0.016, 0.016)
-				op.GeoM.Translate(float64(x) - 10.0, float64(y) - 40.0)
+				op.GeoM.Translate(float64(x)-10.0, float64(y)-40.0)
 				screen.DrawImage(oreImage, op)
 			}
 
@@ -215,21 +227,18 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		y := 200.0
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Scale(0.34, 0.34)
-		op.GeoM.Translate(float64(x) - 18.0, float64(y) - 48.0)
+		op.GeoM.Translate(float64(x)-18.0, float64(y)-48.0)
 		op.ColorM = ebiten.ScaleColor(1, 0, 0, 1)
 		screen.DrawImage(houseImage, op)
 	}
-	// for idxY, row := range g.Board.Tiles {
-	// 	for idxX, _ := range row {
-	// 		x := float32(idxX)*100.0 + 50.0
-	// 		y := float32(idxY)*75.0 + 50.0
-	// 		op := &ebiten.DrawImageOptions{}
-	// 		op.GeoM.Scale(0.4, 0.4)
-	// 		op.GeoM.Translate(float64(x) - 10.0, float64(y) - 40.0)
-	// 		op.ColorM = ebiten.ScaleColor(0, 1, 0, 1)
-	// 		screen.DrawImage(houseImage, op)
-	// 	}
-	// }
+
+	for _, xy := range g.Board.Corners() {
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Scale(0.2, 0.2)
+		op.ColorM = ebiten.ScaleColor(1, 1, 0, 1)
+		op.GeoM.Translate(xy.X, xy.Y)
+		screen.DrawImage(circleImage, op)
+	}
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.CurrentTPS()))
 }

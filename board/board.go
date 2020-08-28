@@ -83,3 +83,34 @@ func NewSimple() Board {
 func shuffle(a []int) {
 	rand.Shuffle(len(a), func(i, j int) { a[i], a[j] = a[j], a[i] })
 }
+
+type XY struct {
+	X float64
+	Y float64
+}
+
+func (b *Board) Corners() []XY {
+	set := make(map[XY]bool, 0)
+	for idxY, row := range b.Tiles {
+		for idxX, tile := range row {
+			if tile.Number > 0 {
+				x := float32(idxX)*100.0 + 50.0 - 11.0
+				y := float32(idxY)*75.0 + 50.0 - 11.0
+				if idxY%2 == 1 {
+					x += 50
+				}
+				set[XY{float64(x), float64(y) - 50.0}] = true
+				set[XY{float64(x), float64(y) + 50.0}] = true
+				set[XY{float64(x) + 50.0, float64(y) - 25.0}] = true
+				set[XY{float64(x) + 50.0, float64(y) + 25.0}] = true
+				set[XY{float64(x) - 50.0, float64(y) - 25.0}] = true
+				set[XY{float64(x) - 50.0, float64(y) + 25.0}] = true
+			}
+		}
+	}
+	all := make([]XY, 0, len(set))
+	for xy := range set {
+		all = append(all, xy)
+	}
+	return all
+}
