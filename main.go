@@ -180,6 +180,21 @@ func (g *Game) Update(screen *ebiten.Image) error {
 	} else if g.LeftMouseClicked {
 		g.LeftMouseClicked = false
 		fmt.Println("You pressed the 'LEFT' mouse button.", g.MouseXY)
+		if corner := g.Board.FindCorner(g.MouseXY); corner != nil {
+			fmt.Println("You selected:", corner)
+			town := g.Board.Towns[*corner]
+			if town.Owner == 0 || town.Owner == 1 { // TODO: Which owner am I? Hardcode "1" here.
+				town.Owner = 1
+				if town.Type < 2 {
+					town.Type += 1
+				}
+				g.Board.Towns[*corner] = town
+				fmt.Println("You selected:", town)
+			} else {
+				// TODO: In game alert
+				fmt.Println("ERROR: Can't steal someones town")
+			}
+		}
 	}
 	// TODO: DO STUFF
 	return nil
@@ -243,14 +258,24 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	for _, xy := range g.Board.Corners {
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Scale(0.2, 0.2)
-		op.ColorM = ebiten.ScaleColor(1, 1, 0, 1)
-		if g.MouseXY.Distance(&xy) <= 11.0 {
-			op.ColorM = ebiten.ScaleColor(0, 0, 1, 1)
+		if town, ok := g.Board.Towns[xy]; ok {
+			if town.Type <= 2 { // TODO: Distinguish between settlement and city
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Scale(0.34, 0.34)
+				op.GeoM.Translate(xy.X-18.0, xy.Y-18.0)
+				op.ColorM = ebiten.ScaleColor(1, 0, 0, 1)
+				screen.DrawImage(houseImage, op)
+			}
+		} else {
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Scale(0.2, 0.2)
+			op.ColorM = ebiten.ScaleColor(1, 1, 0, 1)
+			if g.MouseXY.Distance(&xy) <= 11.0 {
+				op.ColorM = ebiten.ScaleColor(0, 0, 1, 1)
+			}
+			op.GeoM.Translate(xy.X-11.0, xy.Y-11.0)
+			screen.DrawImage(circleImage, op)
 		}
-		op.GeoM.Translate(xy.X-11.0, xy.Y-11.0)
-		screen.DrawImage(circleImage, op)
 	}
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.CurrentTPS()))

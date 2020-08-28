@@ -22,9 +22,15 @@ type Tile struct {
 	HasRobber bool
 }
 
+type Town struct {
+	Owner int
+	Type  int // 1 == Settlement, 2 == City (num victory points)
+}
+
 type Board struct {
 	Tiles   [][]Tile
 	Corners []XY
+	Towns   map[XY]Town
 }
 
 func New(tilePlaces [][]byte, numKlass []int, numbers []int) Board {
@@ -53,6 +59,7 @@ func New(tilePlaces [][]byte, numKlass []int, numbers []int) Board {
 	return Board{
 		Tiles:   tiles,
 		Corners: corners(tiles),
+		Towns:   make(map[XY]Town, 0),
 	}
 }
 
@@ -83,6 +90,15 @@ func NewSimple() Board {
 	return New(tilePlaces, numKlass, numbers)
 }
 
+func (b *Board) FindCorner(xy XY) *XY {
+	for _, corner := range b.Corners {
+		if xy.Distance(&corner) <= 11.0 {
+			return &corner
+		}
+	}
+	return nil
+}
+
 func shuffle(a []int) {
 	rand.Shuffle(len(a), func(i, j int) { a[i], a[j] = a[j], a[i] })
 }
@@ -108,12 +124,12 @@ func corners(tiles [][]Tile) []XY {
 				if idxY%2 == 1 {
 					x += 50
 				}
-				set[XY{float64(x), float64(y) - 50.0}] = true
-				set[XY{float64(x), float64(y) + 50.0}] = true
-				set[XY{float64(x) + 50.0, float64(y) - 25.0}] = true
-				set[XY{float64(x) + 50.0, float64(y) + 25.0}] = true
-				set[XY{float64(x) - 50.0, float64(y) - 25.0}] = true
-				set[XY{float64(x) - 50.0, float64(y) + 25.0}] = true
+				set[XY{X: float64(x), Y: float64(y) - 50.0}] = true
+				set[XY{X: float64(x), Y: float64(y) + 50.0}] = true
+				set[XY{X: float64(x) + 50.0, Y: float64(y) - 25.0}] = true
+				set[XY{X: float64(x) + 50.0, Y: float64(y) + 25.0}] = true
+				set[XY{X: float64(x) - 50.0, Y: float64(y) - 25.0}] = true
+				set[XY{X: float64(x) - 50.0, Y: float64(y) + 25.0}] = true
 			}
 		}
 	}
