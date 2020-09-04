@@ -25,9 +25,9 @@ const (
 )
 
 var (
-	emptyImage, _                                                                    = ebiten.NewImage(16, 16, ebiten.FilterDefault)
-	woodImage, brickImage, sheepImage, wheatImage, oreImage, houseImage, circleImage *ebiten.Image
-	mplusFont                                                                        font.Face
+	emptyImage, _                                                                               = ebiten.NewImage(16, 16, ebiten.FilterDefault)
+	woodImage, brickImage, sheepImage, wheatImage, oreImage, houseImage, roadImage, circleImage *ebiten.Image
+	mplusFont                                                                                   font.Face
 )
 
 func init() {
@@ -104,6 +104,18 @@ func init() {
 			log.Fatal(err)
 		}
 		houseImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+		f.Close()
+	}
+	{
+		f, err := os.Open("images/road.png")
+		if err != nil {
+			log.Fatal(err)
+		}
+		img, _, err := image.Decode(f)
+		if err != nil {
+			log.Fatal(err)
+		}
+		roadImage, _ = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
 		f.Close()
 	}
 	{
@@ -203,6 +215,8 @@ func (g *Game) Update(screen *ebiten.Image) error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	// cf := float64(g.count)
 
+	screen.Fill(color.RGBA{0x77, 0x77, 0x77, 0xff})
+
 	for idxY, row := range g.Board.Tiles {
 		for idxX, tile := range row {
 			x := float32(idxX)*100.0 + 50.0
@@ -247,16 +261,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	{
-		x := 200.0
-		y := 200.0
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Scale(0.34, 0.34)
-		op.GeoM.Translate(float64(x)-18.0, float64(y)-48.0)
-		op.ColorM = ebiten.ScaleColor(1, 0, 0, 1)
-		screen.DrawImage(houseImage, op)
-	}
-
 	for _, xy := range g.Board.Corners {
 		if town, ok := g.Board.Towns[xy]; ok {
 			if town.Type <= 2 { // TODO: Distinguish between settlement and city
@@ -276,6 +280,34 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			op.GeoM.Translate(xy.X-11.0, xy.Y-11.0)
 			screen.DrawImage(circleImage, op)
 		}
+	}
+
+	{
+		// DRAW HOUSE TO CHOOSE TO BUY ONE
+		xy := board.XY{X: 28, Y: screenHeight - 28.0}
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Scale(0.34, 0.34)
+		op.GeoM.Translate(xy.X-18.0, xy.Y-18.0)
+		if g.MouseXY.Distance(&xy) <= 18.0 {
+			op.ColorM = ebiten.ScaleColor(1, 0, 0, 1)
+		} else {
+			op.ColorM = ebiten.ScaleColor(1, 0, 0, 0.3)
+		}
+		screen.DrawImage(houseImage, op)
+	}
+
+	{
+		// DRAW THE ROAD
+		xy := board.XY{X: 68, Y: screenHeight - 28.0}
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Scale(0.34, 0.34)
+		op.GeoM.Translate(xy.X-18.0, xy.Y-18.0)
+		if g.MouseXY.Distance(&xy) <= 18.0 {
+			op.ColorM = ebiten.ScaleColor(1, 0, 0, 1)
+		} else {
+			op.ColorM = ebiten.ScaleColor(1, 0, 0, 0.3)
+		}
+		screen.DrawImage(roadImage, op)
 	}
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.CurrentTPS()))
