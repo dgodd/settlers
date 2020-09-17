@@ -28,10 +28,14 @@ var (
 	emptyImage, _                                                                               = ebiten.NewImage(16, 16, ebiten.FilterDefault)
 	woodImage, brickImage, sheepImage, wheatImage, oreImage, houseImage, roadImage, circleImage *ebiten.Image
 	mplusFont                                                                                   font.Face
+	houseXY, roadXY                                                                             board.XY
 )
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+
+	houseXY = board.XY{X: 28, Y: screenHeight - 28.0}
+	roadXY = board.XY{X: 68, Y: screenHeight - 28.0}
 
 	emptyImage.Fill(color.White)
 	{
@@ -157,6 +161,8 @@ type Game struct {
 	Board            board.Board
 	LeftMouseClicked bool
 	MouseXY          board.XY
+	PlaceHouse       bool
+	PlaceRoad        bool
 }
 
 func hexagon(x, y float32, clr color.RGBA) ([]ebiten.Vertex, []uint16) {
@@ -206,6 +212,14 @@ func (g *Game) Update(screen *ebiten.Image) error {
 				// TODO: In game alert
 				fmt.Println("ERROR: Can't steal someones town")
 			}
+		} else if g.MouseXY.Distance(&houseXY) <= 11.0 {
+			fmt.Println("CLICKED ON HOUSE ICON")
+			g.PlaceHouse = !g.PlaceHouse
+			g.PlaceRoad = false
+		} else if g.MouseXY.Distance(&roadXY) <= 11.0 {
+			fmt.Println("CLICKED ON ROAD ICON")
+			g.PlaceHouse = false
+			g.PlaceRoad = !g.PlaceRoad
 		}
 	}
 	// TODO: DO STUFF
@@ -284,12 +298,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	{
 		// DRAW HOUSE TO CHOOSE TO BUY ONE
-		xy := board.XY{X: 28, Y: screenHeight - 28.0}
+		xy := houseXY
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Scale(0.34, 0.34)
 		op.GeoM.Translate(xy.X-18.0, xy.Y-18.0)
-		if g.MouseXY.Distance(&xy) <= 18.0 {
+		if g.PlaceHouse {
 			op.ColorM = ebiten.ScaleColor(1, 0, 0, 1)
+		} else if g.MouseXY.Distance(&xy) <= 18.0 {
+			op.ColorM = ebiten.ScaleColor(1, 0, 0, 0.5)
 		} else {
 			op.ColorM = ebiten.ScaleColor(1, 0, 0, 0.3)
 		}
@@ -298,12 +314,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	{
 		// DRAW THE ROAD
-		xy := board.XY{X: 68, Y: screenHeight - 28.0}
+		xy := roadXY
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Scale(0.34, 0.34)
 		op.GeoM.Translate(xy.X-18.0, xy.Y-18.0)
-		if g.MouseXY.Distance(&xy) <= 18.0 {
+		if g.PlaceRoad {
 			op.ColorM = ebiten.ScaleColor(1, 0, 0, 1)
+		} else if g.MouseXY.Distance(&xy) <= 18.0 {
+			op.ColorM = ebiten.ScaleColor(1, 0, 0, 0.5)
 		} else {
 			op.ColorM = ebiten.ScaleColor(1, 0, 0, 0.3)
 		}
